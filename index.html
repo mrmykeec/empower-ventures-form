@@ -292,6 +292,8 @@
 
     <!-- Hidden fields populated on submit -->
     <input type="hidden" name="source" id="source">
+    <input type="hidden" name="device" id="device">
+    <input type="hidden" name="fillTime" id="fillTime">
     <input type="hidden" name="birthday" id="birthday">
     <input type="hidden" name="samples" id="samples">
     <input type="hidden" name="purchaseDetails" id="purchaseDetails">
@@ -323,6 +325,28 @@
   const form = document.getElementById('raffle');
   const err = document.getElementById('err');
   const btn = document.getElementById('submitBtn');
+  let formStart = Date.now(); // for "time to complete"; reset on "Enter another"
+
+  // Rough device summary from the user-agent (approximate; iPads can misreport)
+  function deviceSummary() {
+    const ua = navigator.userAgent || '';
+    let os = 'Other';
+    if (/iPhone|iPad|iPod/.test(ua)) os = 'iOS';
+    else if (/Android/.test(ua)) os = 'Android';
+    else if (/Windows/.test(ua)) os = 'Windows';
+    else if (/Macintosh|Mac OS X/.test(ua)) os = 'macOS';
+    else if (/Linux/.test(ua)) os = 'Linux';
+    let br = 'Other';
+    if (/Edg\//.test(ua)) br = 'Edge';
+    else if (/OPR\/|Opera/.test(ua)) br = 'Opera';
+    else if (/CriOS|Chrome\//.test(ua)) br = 'Chrome';
+    else if (/FxiOS|Firefox/.test(ua)) br = 'Firefox';
+    else if (/Safari/.test(ua)) br = 'Safari';
+    let type = 'Desktop';
+    if (/iPad|Tablet/.test(ua) || (/Android/.test(ua) && !/Mobile/.test(ua))) type = 'Tablet';
+    else if (/Mobi|iPhone|iPod/.test(ua)) type = 'Mobile';
+    return type + ' / ' + os + ' / ' + br;
+  }
 
   // If products.js failed to load, stop with a clear message instead of a broken form.
   if (typeof EVENT_CONFIG === 'undefined' || !EVENT_CONFIG.products) {
@@ -588,6 +612,8 @@
       .map(function (c) { return c.value; }).join(', ');
     document.getElementById('samples').value = sampled ? sf : '';
 
+    document.getElementById('fillTime').value = Math.max(0, Math.round((Date.now() - formStart) / 1000));
+
     btn.disabled = true;
     btn.textContent = 'Entering...';
 
@@ -614,6 +640,7 @@
   // next guest. The QR/public version allows just one entry per device.
   const KIOSK = new URLSearchParams(location.search).has('kiosk');
   document.getElementById('source').value = KIOSK ? 'Tablet' : 'Phone (QR)';
+  document.getElementById('device').value = deviceSummary();
   const ENTERED_KEY = 'ev_entered';
   function hasEntered() { try { return !!localStorage.getItem(ENTERED_KEY); } catch (e) { return false; } }
   function markEntered() { try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {} }
@@ -687,6 +714,7 @@
     document.getElementById('thanks').style.display = 'none';
     btn.disabled = false;
     btn.textContent = 'Enter the Raffle';
+    formStart = Date.now(); // restart the fill timer for the next person
     window.scrollTo(0, 0);
   });
 
