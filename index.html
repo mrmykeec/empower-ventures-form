@@ -49,6 +49,9 @@
   .field { margin-bottom: 16px; }
   .row { display: flex; gap: 12px; }
   .row .field { flex: 1; }
+  /* Zip only needs ~5 digits; give Birthday the room so month names fit */
+  .extras-row .field:first-child { flex: 0 1 104px; }
+  .extras-row .field:last-child { flex: 1; }
   label { display: block; font-size: 13px; font-weight: 600; color: var(--purple-dark); margin-bottom: 6px; }
   .opt { font-weight: 400; color: #6b6478; text-transform: none; }
   input[type="text"], input[type="tel"], input[type="email"], select {
@@ -237,7 +240,7 @@
     <!-- Interest questions -->
     <div class="qblock">
       <div class="qnote">A few quick questions, no pressure either way.</div>
-      <div class="qtext">Would you host a get-together to earn free products?</div>
+      <div class="qtext">Would you be interested in hosting an event for free products?</div>
       <div class="pills">
         <input type="radio" id="host-yes" name="hostInterest" value="Yes"><label for="host-yes">Yes</label>
         <input type="radio" id="host-maybe" name="hostInterest" value="Maybe"><label for="host-maybe">Maybe</label>
@@ -255,7 +258,7 @@
     </div>
 
     <!-- Optional extras -->
-    <div class="row">
+    <div class="row extras-row">
       <div class="field">
         <label for="zip">Zip <span class="opt">(optional)</span></label>
         <input type="text" id="zip" name="zip" inputmode="numeric" autocomplete="postal-code">
@@ -264,7 +267,7 @@
         <label>Birthday <span class="opt">(optional)</span></label>
         <div class="row">
           <select id="bdayMonth" name="bdayMonth" style="flex:1" aria-label="Birth month"><option value="">Month</option></select>
-          <select id="bdayDay" name="bdayDay" style="flex:1" aria-label="Birth day"><option value="">Day</option></select>
+          <select id="bdayDay" name="bdayDay" style="flex:0 0 68px" aria-label="Birth day"><option value="">Day</option></select>
         </div>
       </div>
     </div>
@@ -299,7 +302,7 @@
   <!-- Thank-you screen (shown after submit) -->
   <div id="thanks">
     <div class="big">You're entered!</div>
-    <p>Good luck, and thanks for supporting our family.</p>
+    <p>Thank you for coming by our booth and taking the time to enter the raffle. We'll let you know in a day or two if you won.</p>
     <button type="button" id="again">Enter another</button>
   </div>
 </div>
@@ -667,9 +670,20 @@
     })(start);
   }
 
+  // On the success screen, drop the intro tag + subtitles for a clean confirmation
+  function hideIntro() {
+    document.querySelector('.tag').style.display = 'none';
+    document.querySelectorAll('.sub').forEach(function (e) { e.style.display = 'none'; });
+  }
+  function showIntro() {
+    document.querySelector('.tag').style.display = '';
+    document.querySelectorAll('.sub').forEach(function (e) { e.style.display = ''; });
+  }
+
   function showThanks() {
     form.style.display = 'none';
     document.querySelector('.foot').style.display = 'none';
+    hideIntro();
     const t = document.getElementById('thanks');
     const nm = form.firstName.value.trim();
     t.querySelector('.big').textContent = nm
@@ -683,9 +697,10 @@
   function showAlreadyEntered() {
     form.style.display = 'none';
     document.querySelector('.foot').style.display = 'none';
+    hideIntro();
     const t = document.getElementById('thanks');
     t.querySelector('.big').textContent = "You're already entered.";
-    t.querySelector('p').textContent = 'Thanks again, and good luck in the raffle.';
+    t.querySelector('p').textContent = "Thanks again for entering. We'll let you know in a day or two if you won.";
     t.style.display = 'block';
   }
 
@@ -702,6 +717,7 @@
     document.getElementById('purchaseBox').classList.remove('show');
     form.style.display = 'block';
     document.querySelector('.foot').style.display = 'block';
+    showIntro();
     document.getElementById('thanks').style.display = 'none';
     btn.disabled = false;
     btn.textContent = 'Enter the Raffle';
