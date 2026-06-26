@@ -632,10 +632,13 @@
   // ---- Entry mode: kiosk (tablet) vs public (QR on personal phones) ----
   // The tablet is opened with ?kiosk=1 so it keeps "Enter another" and resets for the
   // next guest. The QR/public version allows just one entry per device.
-  const KIOSK = new URLSearchParams(location.search).has('kiosk');
+  const params = new URLSearchParams(location.search);
+  const KIOSK = params.has('kiosk');
+  const ENTERED_KEY = 'ev_entered';
+  // ?reset clears the one-entry-per-device flag (handy for testing; guests never use it)
+  if (params.has('reset')) { try { localStorage.removeItem(ENTERED_KEY); } catch (e) {} }
   document.getElementById('source').value = KIOSK ? 'Tablet' : 'Phone (QR)';
   document.getElementById('device').value = deviceSummary();
-  const ENTERED_KEY = 'ev_entered';
   function hasEntered() { try { return !!localStorage.getItem(ENTERED_KEY); } catch (e) { return false; } }
   function markEntered() { try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {} }
 
