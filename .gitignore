@@ -1,0 +1,14 @@
+# Publish ONLY the files needed for the live form on GitHub Pages.
+# Everything else (Code.gs, SETUP, plan, follow-ups, checklist, changelog,
+# Jackie's mockup) stays local and never goes to the public web.
+
+# Ignore everything by default...
+/*
+
+# ...except these public files:
+!index.html
+!products.js
+!favicon.ico
+!favicon.svg
+!apple-touch-icon.png
+!.gitignore

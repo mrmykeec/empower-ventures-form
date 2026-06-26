@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empower Ventures: Enter the Raffle</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root {
+    --purple: #6b4e9e;
+    --purple-dark: #503a78;
+    --ink: #2b2538;
+    --line: #c9bce0;
+    --bg: #faf7ff;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Calibri, Arial, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, #efe7fb 0%, #f7f3ff 40%, #ffffff 100%);
+    min-height: 100vh;
+    padding: 18px;
+  }
+  .card {
+    max-width: 520px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(80, 58, 120, 0.12);
+    overflow: hidden;
+  }
+  .head {
+    text-align: center;
+    padding: 26px 22px 18px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, #f3eeff 0%, #ffffff 100%);
+  }
+  /* Swap this text block for an <img src="logo.png"> if you add Jackie's logo file */
+  .brand { font-size: 30px; font-weight: 700; color: var(--purple); letter-spacing: .3px; line-height: 1; }
+  .brand .v { display: block; font-style: italic; font-weight: 600; font-size: 26px; margin-top: 2px; }
+  .tag { margin-top: 12px; font-size: 14px; color: var(--purple-dark); text-transform: uppercase; letter-spacing: 2px; }
+  .sub { margin-top: 4px; font-size: 13px; color: #6b6478; }
+
+  form { padding: 20px 22px 26px; }
+  .field { margin-bottom: 16px; }
+  .row { display: flex; gap: 12px; }
+  .row .field { flex: 1; }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--purple-dark); margin-bottom: 6px; }
+  .opt { font-weight: 400; color: #6b6478; text-transform: none; }
+  input[type="text"], input[type="tel"], input[type="email"], select {
+    width: 100%;
+    padding: 13px 12px;
+    font-size: 16px; /* 16px prevents iOS zoom-on-focus */
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  input:focus, select:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px rgba(107,78,158,.15); }
+
+  .qblock { margin: 18px 0; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .qtext { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 9px; }
+  .qnote { font-size: 12px; color: #6b6478; margin-bottom: 10px; }
+  .pills { display: flex; gap: 8px; }
+  .pills input { position: absolute; opacity: 0; pointer-events: none; }
+  .pills label {
+    flex: 1; text-align: center; margin: 0; padding: 11px 0;
+    border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
+    font-weight: 600; color: var(--purple-dark); background: var(--bg);
+    transition: all .12s ease;
+  }
+  .pills input:checked + label { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+  /* Reveal sections (sample flavors, purchase box) */
+  .reveal { display: none; margin-top: 12px; }
+  .reveal.show { display: block; }
+
+  /* Flavor chips (used for samples) */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips input { position: absolute; opacity: 0; pointer-events: none; }
+  .chips label {
+    margin: 0; padding: 8px 12px; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--line); border-radius: 999px; cursor: pointer;
+    color: var(--purple-dark); background: var(--bg);
+  }
+  .chips input:checked + label { background: var(--purple); color: #fff; border-color: var(--purple); }
+  /* Visible keyboard focus for the hidden-input pill/chip pattern */
+  .pills input:focus-visible + label,
+  .chips input:focus-visible + label { box-shadow: 0 0 0 3px rgba(107, 78, 158, .4); }
+
+  /* Purchase builder */
+  .builder { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  .builder .field { margin-bottom: 12px; }
+  .addbtn {
+    width: 100%; margin: 2px 0 0; padding: 12px; font-size: 15px; font-weight: 700;
+    color: var(--purple); background: #fff; border: 1px solid var(--purple); border-radius: 10px; cursor: pointer;
+  }
+  .addbtn:active { background: #f0e9fb; }
+  .items { list-style: none; margin: 12px 0 0; padding: 0; }
+  .items li {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 12px; margin-bottom: 8px; background: #fff;
+    border: 1px solid var(--line); border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--ink);
+  }
+  .items .rm { flex: 0 0 auto; color: #b5304a; background: none; border: none; font-size: 13px; font-weight: 700; cursor: pointer; padding: 4px 6px; width: auto; margin: 0; }
+  .empty { font-size: 13px; color: #6b6478; margin-top: 10px; }
+
+  .consent { display: flex; gap: 10px; align-items: flex-start; margin: 18px 0 6px; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .consent input { width: 22px; height: 22px; margin-top: 1px; accent-color: var(--purple); flex: 0 0 auto; }
+  .consent label { font-weight: 400; font-size: 13px; color: var(--ink); margin: 0; }
+  .privacy { font-size: 12px; color: #6b6478; margin: 8px 0 0; }
+
+  /* Honeypot — hidden from humans, traps bots */
+  .hp { position: absolute; left: -9999px; top: -9999px; height: 0; overflow: hidden; }
+
+  button.submit {
+    width: 100%; margin-top: 18px; padding: 16px;
+    font-size: 17px; font-weight: 700; color: #fff;
+    background: var(--purple); border: none; border-radius: 12px; cursor: pointer;
+  }
+  button.submit:active { background: var(--purple-dark); }
+  button.submit:disabled { opacity: .6; cursor: default; }
+
+  .foot { text-align: center; font-size: 12px; color: var(--purple); padding: 0 22px 22px; }
+  .err { color: #b5304a; font-size: 13px; margin-top: 6px; display: none; }
+
+  /* Per-field live validation */
+  .ferr { color: #b5304a; font-size: 12px; margin-top: 6px; display: none; }
+  input.invalid { border-color: #d4607a; background: #fdf3f5; }
+  input.valid { border-color: #5aa66a; }
+
+  /* Thank-you state */
+  #thanks { display: none; text-align: center; padding: 50px 26px; }
+  #thanks .big { font-size: 24px; font-weight: 700; color: var(--purple); margin-bottom: 10px; }
+  #thanks p { color: var(--ink); font-size: 15px; }
+  #again { display: inline-block; margin-top: 22px; padding: 12px 22px; font-family: inherit; font-size: 15px; font-weight: 600; color: var(--purple); background: var(--bg); border: 1px solid var(--purple); border-radius: 10px; cursor: pointer; }
+
+  /* Gentle motion — only for users who haven't asked for reduced motion */
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes riseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    .card { animation: riseIn .4s ease both; }
+    .reveal.show { animation: riseIn .22s ease both; }
+    #thanks { animation: riseIn .35s ease both; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <div class="brand">Empower<span class="v">Ventures</span></div>
+    <div class="tag">Raffle Entry</div>
+    <div class="sub">Enter our raffle, and we'll keep you posted on specials and events.</div>
+    <div class="sub">Takes about a minute.</div>
+  </div>
+
+  <form id="raffle" novalidate>
+    <div class="row">
+      <div class="field">
+        <label for="firstName">First name</label>
+        <input type="text" id="firstName" name="firstName" autocomplete="given-name" required>
+      </div>
+      <div class="field">
+        <label for="lastName">Last name</label>
+        <input type="text" id="lastName" name="lastName" autocomplete="family-name" required>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="phone">Phone <span class="opt">(phone or email required)</span></label>
+      <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" placeholder="(303) 555-1234">
+      <div class="ferr" id="phoneErr" aria-live="polite"></div>
+    </div>
+
+    <div class="field">
+      <label for="email">Email <span class="opt">(phone or email required)</span></label>
+      <input type="email" id="email" name="email" autocomplete="email" inputmode="email" placeholder="name@email.com">
+      <div class="ferr" id="emailErr" aria-live="polite"></div>
+    </div>
+
+    <!-- Preferred contact method -->
+    <div class="field">
+      <label>How should we reach you? <span class="opt">(optional)</span></label>
+      <div class="pills">
+        <input type="radio" id="cp-text" name="contactPref" value="Text"><label for="cp-text">Text</label>
+        <input type="radio" id="cp-email" name="contactPref" value="Email"><label for="cp-email">Email</label>
+        <input type="radio" id="cp-call" name="contactPref" value="Call"><label for="cp-call">Call</label>
+        <input type="radio" id="cp-any" name="contactPref" value="Any"><label for="cp-any">Any</label>
+      </div>
+    </div>
+
+    <!-- Sample question -->
+    <div class="qblock">
+      <div class="qtext">Did you get a sample today? <span class="opt">(optional)</span></div>
+      <div class="pills">
+        <input type="radio" id="samp-yes" name="sampled" value="Yes"><label for="samp-yes">Yes</label>
+        <input type="radio" id="samp-no" name="sampled" value="No"><label for="samp-no">No</label>
+      </div>
+      <div class="reveal" id="sampleBox">
+        <label>Which one(s)? <span class="opt">(tap all that apply)</span></label>
+        <div class="chips" id="sampleChips"><!-- sample chips injected from products.js --></div>
+      </div>
+    </div>
+
+    <!-- Purchase question -->
+    <div class="qblock">
+      <div class="qtext">Did you pick up any products today?</div>
+      <div class="pills">
+        <input type="radio" id="buy-yes" name="purchased" value="Yes"><label for="buy-yes">Yes</label>
+        <input type="radio" id="buy-no" name="purchased" value="No"><label for="buy-no">No</label>
+      </div>
+
+      <div class="reveal" id="purchaseBox">
+        <div class="builder">
+          <div class="field">
+            <label for="prodSelect">Product</label>
+            <select id="prodSelect"><!-- products injected from products.js --></select>
+          </div>
+          <div class="field" id="flavorField" style="display:none;">
+            <label for="flavorSelect">Flavor</label>
+            <select id="flavorSelect"><!-- flavors injected from products.js --></select>
+          </div>
+          <div class="field">
+            <label for="qtyInput">Quantity</label>
+            <input type="text" id="qtyInput" inputmode="numeric" value="1">
+          </div>
+          <button type="button" class="addbtn" id="addItem">+ Add item</button>
+          <ul class="items" id="itemList"></ul>
+          <div class="empty" id="itemsEmpty">No items added yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interest questions -->
+    <div class="qblock">
+      <div class="qnote">A few quick questions, no pressure either way.</div>
+      <div class="qtext">Would you host a get-together to earn free products?</div>
+      <div class="pills">
+        <input type="radio" id="host-yes" name="hostInterest" value="Yes"><label for="host-yes">Yes</label>
+        <input type="radio" id="host-maybe" name="hostInterest" value="Maybe"><label for="host-maybe">Maybe</label>
+        <input type="radio" id="host-no" name="hostInterest" value="No"><label for="host-no">No</label>
+      </div>
+    </div>
+
+    <div class="qblock">
+      <div class="qtext">Want to hear how the business side works?</div>
+      <div class="pills">
+        <input type="radio" id="biz-yes" name="bizInterest" value="Yes"><label for="biz-yes">Yes</label>
+        <input type="radio" id="biz-maybe" name="bizInterest" value="Maybe"><label for="biz-maybe">Maybe</label>
+        <input type="radio" id="biz-no" name="bizInterest" value="No"><label for="biz-no">No</label>
+      </div>
+    </div>
+
+    <div class="qblock">
+      <div class="qtext">Want updates on parties, specials, and new products?</div>
+      <div class="pills">
+        <input type="radio" id="info-yes" name="infoInterest" value="Yes"><label for="info-yes">Yes</label>
+        <input type="radio" id="info-maybe" name="infoInterest" value="Maybe"><label for="info-maybe">Maybe</label>
+        <input type="radio" id="info-no" name="infoInterest" value="No"><label for="info-no">No</label>
+      </div>
+    </div>
+
+    <!-- Optional extras -->
+    <div class="row">
+      <div class="field">
+        <label for="zip">Zip <span class="opt">(optional)</span></label>
+        <input type="text" id="zip" name="zip" inputmode="numeric" autocomplete="postal-code">
+      </div>
+      <div class="field">
+        <label>Birthday <span class="opt">(optional)</span></label>
+        <div class="row">
+          <select id="bdayMonth" name="bdayMonth" style="flex:1" aria-label="Birth month"><option value="">Month</option></select>
+          <select id="bdayDay" name="bdayDay" style="flex:1" aria-label="Birth day"><option value="">Day</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consent (TCPA opt-in) -->
+    <div class="consent">
+      <input type="checkbox" id="consent" name="consent" value="Yes" required>
+      <label for="consent">Yes, you can reach me about specials and events.</label>
+    </div>
+    <div class="privacy">We'll only use this to reach you about specials and the raffle, and we never share your info.</div>
+
+    <!-- Honeypot: bots fill this, humans never see it -->
+    <div class="hp" aria-hidden="true">
+      <label>Company<input type="text" name="company" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <!-- Hidden fields populated on submit -->
+    <input type="hidden" name="birthday" id="birthday">
+    <input type="hidden" name="samples" id="samples">
+    <input type="hidden" name="purchaseDetails" id="purchaseDetails">
+    <input type="hidden" name="totalItems" id="totalItems">
+
+    <div class="err" id="err" role="alert" aria-live="assertive">Please fill out the required fields and check the box.</div>
+    <button type="submit" class="submit" id="submitBtn">Enter the Raffle</button>
+  </form>
+
+  <div class="foot">Thank you for supporting our family.</div>
+
+  <!-- Thank-you screen (shown after submit) -->
+  <div id="thanks">
+    <div class="big">You're entered!</div>
+    <p>Good luck, and thanks for supporting our family.</p>
+    <button type="button" id="again">Enter another</button>
+  </div>
+</div>
+
+<!-- Event products + flavors live here. Edit products.js for future events. -->
+<script src="products.js"></script>
+<script>
+  // ====================================================================
+  // PASTE YOUR APPS SCRIPT WEB APP URL BETWEEN THE QUOTES BELOW.
+  // (You get this in SETUP.md, Step 2 — it ends in /exec)
+  // ====================================================================
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzcb_qif-y-reuXsZPYdXJnX6LUiMlMvRJWW78svz4r3UBxZbRyxmF2Rhe64Nuuxy7r-Q/exec";
+
+  const form = document.getElementById('raffle');
+  const err = document.getElementById('err');
+  const btn = document.getElementById('submitBtn');
+
+  // If products.js failed to load, stop with a clear message instead of a broken form.
+  if (typeof EVENT_CONFIG === 'undefined' || !EVENT_CONFIG.products) {
+    err.textContent = 'This form could not load. Please refresh the page.';
+    err.style.display = 'block';
+    btn.disabled = true;
+    throw new Error('EVENT_CONFIG missing');
+  }
+
+  // ---- Data-integrity helpers ----
+  // Normalize a US phone to "(303) 555-1234"; return null if it isn't 10 digits.
+  function normPhone(v) {
+    const d = v.replace(/\D/g, '');
+    const ten = (d.length === 11 && d[0] === '1') ? d.slice(1) : d;
+    if (ten.length !== 10) return null;
+    return '(' + ten.slice(0, 3) + ') ' + ten.slice(3, 6) + '-' + ten.slice(6);
+  }
+  // Live formatting as they type -> (303) 356-4659
+  function formatPhoneLive(v) {
+    let d = v.replace(/\D/g, '');
+    if (d.length === 11 && d[0] === '1') d = d.slice(1);
+    d = d.slice(0, 10);
+    if (d.length > 6) return '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6);
+    if (d.length > 3) return '(' + d.slice(0, 3) + ') ' + d.slice(3);
+    if (d.length > 0) return '(' + d;
+    return '';
+  }
+  function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function fail(msg) { err.textContent = msg; err.style.display = 'block'; }
+
+  // ---- Build the dynamic parts from EVENT_CONFIG (products.js) ----
+  const prodSelect  = document.getElementById('prodSelect');
+  const flavorField = document.getElementById('flavorField');
+  const flavorSelect= document.getElementById('flavorSelect');
+  const sampleChips = document.getElementById('sampleChips');
+
+  EVENT_CONFIG.products.forEach(function (pr) {
+    const o = document.createElement('option');
+    o.value = pr.id; o.textContent = pr.label;
+    prodSelect.appendChild(o);
+  });
+  EVENT_CONFIG.flavors.forEach(function (f) {
+    const o = document.createElement('option');
+    o.value = f; o.textContent = f;
+    flavorSelect.appendChild(o);
+  });
+  // Sample list = XS flavors + any take-home / sample-only extras (pre-workout, etc.)
+  const sampleItems = EVENT_CONFIG.flavors.concat(EVENT_CONFIG.sampleExtras || []);
+  sampleItems.forEach(function (f, i) {
+    const id = 'sf-' + i;
+    const inp = document.createElement('input');
+    inp.type = 'checkbox'; inp.id = id; inp.value = f; inp.className = 'sampleItem';
+    const lab = document.createElement('label');
+    lab.setAttribute('for', id); lab.textContent = f;
+    sampleChips.appendChild(inp); sampleChips.appendChild(lab);
+  });
+
+  // Birthday Month + Day dropdowns (no year). Saved as MM/DD on submit.
+  const MONTHS = ['January','February','March','April','May','June','July',
+                  'August','September','October','November','December'];
+  const bdayMonth = document.getElementById('bdayMonth');
+  const bdayDay = document.getElementById('bdayDay');
+  MONTHS.forEach(function (name, i) {
+    const o = document.createElement('option');
+    o.value = ('0' + (i + 1)).slice(-2); o.textContent = name;
+    bdayMonth.appendChild(o);
+  });
+  for (let d = 1; d <= 31; d++) {
+    const o = document.createElement('option');
+    o.value = ('0' + d).slice(-2); o.textContent = d;
+    bdayDay.appendChild(o);
+  }
+
+  function productById(id) {
+    return EVENT_CONFIG.products.filter(function (p) { return p.id === id; })[0];
+  }
+
+  // Show the flavor dropdown only for products that have flavors
+  function syncFlavorVisibility() {
+    const pr = productById(prodSelect.value);
+    flavorField.style.display = (pr && pr.hasFlavor) ? 'block' : 'none';
+  }
+  prodSelect.addEventListener('change', syncFlavorVisibility);
+  syncFlavorVisibility();
+
+  // ---- Reveal sections on Yes/No ----
+  function wireReveal(name, boxId) {
+    const box = document.getElementById(boxId);
+    form.querySelectorAll('input[name="' + name + '"]').forEach(function (r) {
+      r.addEventListener('change', function () {
+        box.classList.toggle('show', r.value === 'Yes' && r.checked);
+      });
+    });
+  }
+  wireReveal('sampled', 'sampleBox');
+  wireReveal('purchased', 'purchaseBox');
+
+  // ---- Purchase item list ----
+  const items = []; // { productId, label, flavor, qty }
+  const itemList = document.getElementById('itemList');
+  const itemsEmpty = document.getElementById('itemsEmpty');
+
+  function renderItems() {
+    itemList.innerHTML = '';
+    itemsEmpty.style.display = items.length ? 'none' : 'block';
+    items.forEach(function (it, idx) {
+      const li = document.createElement('li');
+      const name = it.flavor ? (it.label + ' (' + it.flavor + ')') : it.label;
+      const span = document.createElement('span');
+      span.textContent = it.qty + ' × ' + name;
+      const rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'rm'; rm.textContent = 'remove';
+      rm.addEventListener('click', function () { items.splice(idx, 1); renderItems(); });
+      li.appendChild(span); li.appendChild(rm);
+      itemList.appendChild(li);
+    });
+  }
+
+  document.getElementById('addItem').addEventListener('click', function () {
+    const pr = productById(prodSelect.value);
+    if (!pr) return;
+    const qty = parseInt(document.getElementById('qtyInput').value, 10);
+    if (!qty || qty < 1 || qty > 99) { alert('Enter a quantity between 1 and 99.'); return; }
+    items.push({
+      productId: pr.id,
+      label: pr.label,
+      flavor: pr.hasFlavor ? flavorSelect.value : '',
+      qty: qty
+    });
+    renderItems();
+    // reset the picker for the next item
+    document.getElementById('qtyInput').value = '1';
+  });
+
+  // ---- Real-time validation for phone + email ----
+  // Validates as they type, but only AFTER they've left the field once (no nagging
+  // mid-type). Also tidies phone/email format on blur.
+  const phoneEl = form.phone, phoneErr = document.getElementById('phoneErr');
+  const emailEl = form.email, emailErr = document.getElementById('emailErr');
+  let phoneTouched = false, emailTouched = false;
+
+  function setFieldState(el, errEl, ok, msg) {
+    if (ok) {
+      el.classList.remove('invalid'); el.classList.add('valid');
+      errEl.style.display = 'none';
+    } else {
+      el.classList.add('invalid'); el.classList.remove('valid');
+      errEl.textContent = msg; errEl.style.display = 'block';
+    }
+  }
+  function clearFieldState(el, errEl) {
+    el.classList.remove('invalid', 'valid');
+    errEl.style.display = 'none';
+  }
+  function checkPhoneLive() {
+    const v = phoneEl.value.trim();
+    if (!v) { clearFieldState(phoneEl, phoneErr); return; } // empty is OK (email may cover it)
+    setFieldState(phoneEl, phoneErr, !!normPhone(v), 'Enter a 10-digit US phone (like 303-555-1234).');
+  }
+  function checkEmailLive() {
+    const v = emailEl.value.trim();
+    if (!v) { clearFieldState(emailEl, emailErr); return; }
+    setFieldState(emailEl, emailErr, validEmail(v), "That email doesn't look right — check for a typo.");
+  }
+  phoneEl.addEventListener('blur', function () {
+    phoneTouched = true;
+    const np = normPhone(phoneEl.value.trim());
+    if (np) phoneEl.value = np; // tidy to (303) 555-1234 once they leave the field
+    checkPhoneLive();
+  });
+  phoneEl.addEventListener('input', function () {
+    phoneEl.value = formatPhoneLive(phoneEl.value); // (303) 356-4659 as they type
+    if (phoneTouched) checkPhoneLive();
+  });
+  emailEl.addEventListener('blur', function () {
+    emailTouched = true;
+    emailEl.value = emailEl.value.trim().toLowerCase();
+    checkEmailLive();
+  });
+  emailEl.addEventListener('input', function () { if (emailTouched) checkEmailLive(); });
+
+  // ---- Submit ----
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    err.style.display = 'none';
+
+    const bought = form.purchased.value === 'Yes';
+    const sampled = form.sampled.value === 'Yes';
+
+    // Required-field check — only the essentials are required (name, a contact method,
+    // consent); everything else is optional. Point at the first missing field and scroll.
+    const checks = [
+      [form.firstName.value.trim(), 'Enter your first name.', form.firstName],
+      [form.lastName.value.trim(),  'Enter your last name.',  form.lastName],
+      [form.purchased.value,        'Please answer: did you pick up any products today?', document.getElementById('buy-yes').closest('.qblock')],
+      [form.consent.checked,        'Please check the box so we can reach you.', form.consent],
+    ];
+    for (let i = 0; i < checks.length; i++) {
+      if (!checks[i][0]) {
+        fail(checks[i][1]);
+        const node = checks[i][2];
+        if (node && node.scrollIntoView) node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    }
+
+    // --- Contact: phone OR email required, each validated + cleaned ---
+    const phoneRaw = form.phone.value.trim();
+    const emailRaw = form.email.value.trim().toLowerCase();
+    if (!phoneRaw && !emailRaw) {
+      fail('Enter a phone number or an email so we can reach you.');
+      return;
+    }
+    if (phoneRaw) {
+      const np = normPhone(phoneRaw);
+      if (!np) { fail('That phone number needs 10 digits (like 303-555-1234).'); return; }
+      form.phone.value = np; // store it in one clean format
+    }
+    if (emailRaw) {
+      if (!validEmail(emailRaw)) { fail("That email doesn't look right — check for a typo."); return; }
+      form.email.value = emailRaw; // store it lowercase + trimmed
+    }
+    // Preferred channel must match what they actually gave us
+    const pref = form.contactPref.value;
+    if ((pref === 'Text' || pref === 'Call') && !form.phone.value.trim()) {
+      fail('You chose ' + pref + ' — add a phone number, or switch how we reach you.');
+      return;
+    }
+    if (pref === 'Email' && !emailRaw) {
+      fail('You chose Email — add an email, or switch how we reach you.');
+      return;
+    }
+    // Zip (optional): 5 digits if provided
+    const zip = form.zip.value.trim();
+    if (zip && !/^\d{5}$/.test(zip)) { fail('Zip should be 5 digits.'); return; }
+    // Birthday (optional): need both Month and Day, or neither. Saved as MM/DD.
+    const bM = form.bdayMonth.value, bD = form.bdayDay.value;
+    if ((bM && !bD) || (!bM && bD)) {
+      fail('Pick both a month and a day for the birthday, or leave both blank.');
+      (bM ? bdayDay : bdayMonth).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    form.birthday.value = (bM && bD) ? (bM + '/' + bD) : '';
+
+    // If they said they bought, make sure at least one item is listed
+    if (bought && items.length === 0) {
+      err.textContent = 'Add at least one item, or change "Did you pick up any products" to No.';
+      err.style.display = 'block';
+      return;
+    }
+
+    // Pack the purchase + sample data into the hidden fields
+    let totalQty = 0;
+    const summary = items.map(function (it) {
+      totalQty += it.qty;
+      const name = it.flavor ? (it.label + ' (' + it.flavor + ')') : it.label;
+      return it.qty + '× ' + name;
+    }).join(', ');
+    document.getElementById('purchaseDetails').value = bought ? summary : '';
+    document.getElementById('totalItems').value = bought ? String(totalQty) : '';
+
+    const sf = Array.prototype.slice.call(document.querySelectorAll('.sampleItem:checked'))
+      .map(function (c) { return c.value; }).join(', ');
+    document.getElementById('samples').value = sampled ? sf : '';
+
+    btn.disabled = true;
+    btn.textContent = 'Entering...';
+
+    const data = new URLSearchParams(new FormData(form)).toString();
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Apps Script accepts the write; we show success optimistically
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+      body: data
+    })
+    .then(function () { showThanks(); })
+    .catch(function () {
+      // Network failed entirely — let them retry rather than lose the entry
+      btn.disabled = false;
+      btn.textContent = 'Enter the Raffle';
+      err.textContent = 'No connection. Check wifi/hotspot and tap again.';
+      err.style.display = 'block';
+    });
+  });
+
+  // ---- Entry mode: kiosk (tablet) vs public (QR on personal phones) ----
+  // The tablet is opened with ?kiosk=1 so it keeps "Enter another" and resets for the
+  // next guest. The QR/public version allows just one entry per device.
+  const KIOSK = new URLSearchParams(location.search).has('kiosk');
+  const ENTERED_KEY = 'ev_entered';
+  function hasEntered() { try { return !!localStorage.getItem(ENTERED_KEY); } catch (e) { return false; } }
+  function markEntered() { try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {} }
+
+  // Confetti burst on success (skipped if the user prefers reduced motion)
+  function celebrate() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const c = document.createElement('canvas');
+    c.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999';
+    c.width = window.innerWidth; c.height = window.innerHeight;
+    document.body.appendChild(c);
+    const ctx = c.getContext('2d');
+    const colors = ['#6b4e9e', '#503a78', '#c9bce0', '#f0c419', '#ffffff'];
+    const parts = [];
+    for (let i = 0; i < 130; i++) {
+      parts.push({
+        x: Math.random() * c.width, y: -20 - Math.random() * c.height * 0.3,
+        r: 4 + Math.random() * 6, color: colors[(Math.random() * colors.length) | 0],
+        vx: -2 + Math.random() * 4, vy: 2 + Math.random() * 4,
+        rot: Math.random() * Math.PI, vr: -0.2 + Math.random() * 0.4
+      });
+    }
+    const start = performance.now();
+    (function frame(t) {
+      ctx.clearRect(0, 0, c.width, c.height);
+      parts.forEach(function (p) {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.rot += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.fillStyle = p.color; ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.6);
+        ctx.restore();
+      });
+      if (t - start < 2200) requestAnimationFrame(frame); else c.remove();
+    })(start);
+  }
+
+  function showThanks() {
+    form.style.display = 'none';
+    document.querySelector('.foot').style.display = 'none';
+    const t = document.getElementById('thanks');
+    const nm = form.firstName.value.trim();
+    t.querySelector('.big').textContent = nm
+      ? "You're entered, " + nm.charAt(0).toUpperCase() + nm.slice(1) + "!"
+      : "You're entered!";
+    t.style.display = 'block';
+    if (!KIOSK) markEntered(); // remember this phone already entered
+    celebrate();
+  }
+
+  function showAlreadyEntered() {
+    form.style.display = 'none';
+    document.querySelector('.foot').style.display = 'none';
+    const t = document.getElementById('thanks');
+    t.querySelector('.big').textContent = "You're already entered.";
+    t.querySelector('p').textContent = 'Thanks again, and good luck in the raffle.';
+    t.style.display = 'block';
+  }
+
+  // "Enter another" resets the form for the next person at the tablet
+  document.getElementById('again').addEventListener('click', function () {
+    form.reset();
+    items.length = 0;
+    renderItems();
+    syncFlavorVisibility();
+    clearFieldState(phoneEl, phoneErr);
+    clearFieldState(emailEl, emailErr);
+    phoneTouched = false; emailTouched = false;
+    document.getElementById('sampleBox').classList.remove('show');
+    document.getElementById('purchaseBox').classList.remove('show');
+    form.style.display = 'block';
+    document.querySelector('.foot').style.display = 'block';
+    document.getElementById('thanks').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Enter the Raffle';
+    window.scrollTo(0, 0);
+  });
+
+  // Apply entry mode on load
+  if (KIOSK) {
+    // Shared tablet: turn off autofill so one guest's info never pre-fills for the next
+    form.setAttribute('autocomplete', 'off');
+    Array.prototype.forEach.call(form.querySelectorAll('input'), function (el) {
+      el.setAttribute('autocomplete', 'off');
+    });
+  } else {
+    // Public / QR: one entry per device, no "Enter another" button
+    document.getElementById('again').style.display = 'none';
+    if (hasEntered()) showAlreadyEntered();
+  }
+
+  renderItems();
+</script>
+</body>
+</html>
