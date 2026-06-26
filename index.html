@@ -291,6 +291,7 @@
     </div>
 
     <!-- Hidden fields populated on submit -->
+    <input type="hidden" name="source" id="source">
     <input type="hidden" name="birthday" id="birthday">
     <input type="hidden" name="samples" id="samples">
     <input type="hidden" name="purchaseDetails" id="purchaseDetails">
@@ -612,6 +613,7 @@
   // The tablet is opened with ?kiosk=1 so it keeps "Enter another" and resets for the
   // next guest. The QR/public version allows just one entry per device.
   const KIOSK = new URLSearchParams(location.search).has('kiosk');
+  document.getElementById('source').value = KIOSK ? 'Tablet' : 'Phone (QR)';
   const ENTERED_KEY = 'ev_entered';
   function hasEntered() { try { return !!localStorage.getItem(ENTERED_KEY); } catch (e) { return false; } }
   function markEntered() { try { localStorage.setItem(ENTERED_KEY, '1'); } catch (e) {} }
